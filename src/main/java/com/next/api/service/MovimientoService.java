@@ -89,4 +89,21 @@ public class MovimientoService {
         return result;
     }
 
+    public Map<String, Object> realizarTransferencia(Integer tarjetaId, Long cantidad, String iban) {
+        Map<String, Object> result = new HashMap<>();
+        Tarjeta tarjeta = tarjetaRespository.getOne(tarjetaId);
+        Cuenta cuenta = tarjeta.getCuenta();
+        Long nuevoSaldo = cuenta.getSaldo() - cantidad;
+        cuenta.setSaldo(nuevoSaldo);
+        cuentaRespository.save(cuenta);
+        Movimiento movimiento = new Movimiento();
+        movimiento.setCantidad(cantidad);
+        movimiento.setTipo("Transferencia a " + iban);
+        movimiento.setCuenta(cuenta);
+        movimiento.setFecha(new Date());
+        movimientoRespository.save(movimiento);
+        result.put("saldo", cuenta.getSaldo());
+        result.put("ok", true);
+        return result;
+    }
 }
