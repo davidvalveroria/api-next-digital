@@ -44,5 +44,21 @@ public class TarjetaService {
         return result;
     }
 
+    public Map<String, Object> cambiarPin(Integer tarjetaId, String pinNuevo, String pinAntiguo) {
+        Map<String, Object> result = new HashMap<>();
+        Tarjeta tarjeta = tarjetaRespository.getOne(tarjetaId);
+        if(pinAntiguo.equals(tarjeta.getPin())) {
+            tarjeta.setActivada(true);
+            tarjeta.setPin(pinNuevo);
+            tarjetaRespository.save(tarjeta);
+            result.put("mensaje", "Pin cambiado correctamente.");
+            result.put("ok", true);
+        } else {
+            result.put("mensaje", "El pin introducido no es correcto.");
+            result.put("ok", false);
+        }
+        return result;
+    }
+
 
 }
