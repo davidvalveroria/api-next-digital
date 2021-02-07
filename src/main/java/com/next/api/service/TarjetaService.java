@@ -3,18 +3,13 @@ package com.next.api.service;
 import com.next.api.entity.Cajero;
 import com.next.api.entity.Tarjeta;
 import com.next.api.repository.CajeroRespository;
-import com.next.api.repository.CuentaRespository;
-import com.next.api.repository.MovimientoRespository;
 import com.next.api.repository.TarjetaRespository;
 import com.next.api.utils.Utils;
-import org.jasypt.encryption.pbe.StandardPBEStringEncryptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 @Service
 public class TarjetaService {
