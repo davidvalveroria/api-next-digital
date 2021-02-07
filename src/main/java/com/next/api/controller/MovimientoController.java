@@ -1,5 +1,6 @@
 package com.next.api.controller;
 
+import com.next.api.dto.MovimientoDTO;
 import com.next.api.service.MovimientoService;
 import com.next.api.service.TarjetaService;
 import com.next.api.utils.Utils;
@@ -21,7 +22,7 @@ public class MovimientoController {
     TarjetaService tarjetaService;
 
     @GetMapping("/movimientos/{cuenta}")
-    public List<Object> getAll(@PathVariable Integer cuenta) {
+    public List<MovimientoDTO> getAll(@PathVariable Integer cuenta) {
         return movimientoService.getMovimientosClienteCuenta(cuenta);
     }
 
@@ -61,7 +62,7 @@ public class MovimientoController {
     @ResponseBody
     public Object realizarTransferencia(Integer tarjeta, Long cantidad, String iban) {
         if (tarjetaService.isActiva(tarjeta)) {
-            if(Utils.validar(iban)) {
+            if (Utils.validar(iban)) {
                 return movimientoService.realizarTransferencia(tarjeta, cantidad, iban);
             } else {
                 Map<String, Object> error = new HashMap<>();

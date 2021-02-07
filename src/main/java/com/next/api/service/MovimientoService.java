@@ -1,5 +1,6 @@
 package com.next.api.service;
 
+import com.next.api.dto.MovimientoDTO;
 import com.next.api.entity.Cuenta;
 import com.next.api.entity.Movimiento;
 import com.next.api.entity.Tarjeta;
@@ -24,7 +25,7 @@ public class MovimientoService {
     @Autowired
     TarjetaRespository tarjetaRespository;
 
-    public List<Object> getMovimientosClienteCuenta(Integer cuentaId) {
+    public List<MovimientoDTO> getMovimientosClienteCuenta(Integer cuentaId) {
         return movimientoRespository.findByCuenta(cuentaId);
     }
 
