@@ -18,7 +18,7 @@ public class TarjetaController {
 
     @PostMapping("/tarjeta/activar")
     @ResponseBody
-    public Object realizarTransferencia(Integer tarjeta, String pin) {
+    public Object activarTarjeta(Integer tarjeta, String pin) {
         if (tarjetaService.isActiva(tarjeta)) {
             Map<String, Object> error = new HashMap<>();
             error.put("mensaje", "Su tarjeta ya está activada.");
