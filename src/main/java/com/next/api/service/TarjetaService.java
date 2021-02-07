@@ -6,6 +6,8 @@ import com.next.api.repository.CajeroRespository;
 import com.next.api.repository.CuentaRespository;
 import com.next.api.repository.MovimientoRespository;
 import com.next.api.repository.TarjetaRespository;
+import com.next.api.utils.Utils;
+import org.jasypt.encryption.pbe.StandardPBEStringEncryptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +23,8 @@ public class TarjetaService {
     TarjetaRespository tarjetaRespository;
     @Autowired
     CajeroRespository cajeroRespository;
+    @Autowired
+    Utils utils;
 
     public Boolean isActiva(Integer tarjetaId) {
         Tarjeta tarjeta = tarjetaRespository.getOne(tarjetaId);
@@ -37,7 +41,14 @@ public class TarjetaService {
         Map<String, Object> result = new HashMap<>();
         Tarjeta tarjeta = tarjetaRespository.getOne(tarjetaId);
         tarjeta.setActivada(true);
-        tarjeta.setPin(pin);
+        try {
+            tarjeta.setPin(utils.encriptar(pin));
+        } catch (Exception e) {
+            e.printStackTrace();
+            result.put("mensaje", "No se ha podido encriptar el pin");
+            result.put("ok", false);
+            return result;
+        }
         tarjetaRespository.save(tarjeta);
         result.put("mensaje", "Activada correctamente");
         result.put("ok", true);
@@ -47,9 +58,25 @@ public class TarjetaService {
     public Map<String, Object> cambiarPin(Integer tarjetaId, String pinNuevo, String pinAntiguo) {
         Map<String, Object> result = new HashMap<>();
         Tarjeta tarjeta = tarjetaRespository.getOne(tarjetaId);
-        if(pinAntiguo.equals(tarjeta.getPin())) {
+        String pinDesencriptado = "";
+        try {
+            pinDesencriptado = utils.desencriptar(tarjeta.getPin());
+        } catch (Exception e) {
+            e.printStackTrace();
+            result.put("mensaje", "No se ha podido desencriptar el pin");
+            result.put("ok", false);
+            return result;
+        }
+        if (pinAntiguo.equals(pinDesencriptado)) {
             tarjeta.setActivada(true);
-            tarjeta.setPin(pinNuevo);
+            try {
+                tarjeta.setPin(utils.encriptar(pinNuevo));
+            } catch (Exception e) {
+                e.printStackTrace();
+                result.put("mensaje", "No se ha podido encriptar el pin");
+                result.put("ok", false);
+                return result;
+            }
             tarjetaRespository.save(tarjeta);
             result.put("mensaje", "Pin cambiado correctamente.");
             result.put("ok", true);

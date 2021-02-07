@@ -31,12 +31,18 @@ public class TarjetaController {
     @PostMapping("/tarjeta/cambiarpin")
     @ResponseBody
     public Object cambiarPin(Integer tarjeta, String pinNuevo, String pinAntiguo) {
+        Map<String, Object> result = new HashMap<>();
         if (!tarjetaService.isActiva(tarjeta)) {
-            Map<String, Object> error = new HashMap<>();
-            error.put("mensaje", "Debe activar primero su tarjeta.");
-            return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+            result.put("mensaje", "Debe activar primero su tarjeta.");
+            return new ResponseEntity<>(result, HttpStatus.BAD_REQUEST);
         } else {
-            return tarjetaService.cambiarPin(tarjeta, pinNuevo, pinAntiguo);
+            result = tarjetaService.cambiarPin(tarjeta, pinNuevo, pinAntiguo);
+            if(!(Boolean)result.get("ok")){
+                return new ResponseEntity<>(result, HttpStatus.INTERNAL_SERVER_ERROR);
+            } else {
+                return result;
+            }
+
         }
     }
 

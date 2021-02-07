@@ -1,8 +1,29 @@
 package com.next.api.utils;
 
+import org.springframework.core.env.Environment;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+
+import java.io.UnsupportedEncodingException;
+import java.security.InvalidKeyException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
+import java.util.Base64;
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.spec.SecretKeySpec;
+
 import java.math.BigInteger;
 
+@Service
 public class Utils {
+
+    @Autowired
+    private Environment env;
 
     public static boolean validar(String cuenta) {
         boolean esValido = false;
@@ -45,4 +66,47 @@ public class Utils {
 
         return esValido;
     }
+
+    public String encriptar(String datos) throws UnsupportedEncodingException, NoSuchAlgorithmException, InvalidKeyException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException {
+        String clave = this.env.getProperty("encrypt.pass");
+        byte[] claveEncriptacion = clave.getBytes("UTF-8");
+
+        MessageDigest sha = MessageDigest.getInstance("SHA-1");
+
+        claveEncriptacion = sha.digest(claveEncriptacion);
+        claveEncriptacion = Arrays.copyOf(claveEncriptacion, 16);
+
+        SecretKeySpec secretKey = new SecretKeySpec(claveEncriptacion, "AES");
+
+        Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
+        cipher.init(Cipher.ENCRYPT_MODE, secretKey);
+
+        byte[] datosEncriptar = datos.getBytes("UTF-8");
+        byte[] bytesEncriptados = cipher.doFinal(datosEncriptar);
+        String encriptado = Base64.getEncoder().encodeToString(bytesEncriptados);
+
+        return encriptado;
+    }
+
+    public String desencriptar(String datosEncriptados) throws UnsupportedEncodingException, NoSuchAlgorithmException, InvalidKeyException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException {
+        String clave = this.env.getProperty("encrypt.pass");
+        byte[] claveEncriptacion = clave.getBytes("UTF-8");
+
+        MessageDigest sha = MessageDigest.getInstance("SHA-1");
+
+        claveEncriptacion = sha.digest(claveEncriptacion);
+        claveEncriptacion = Arrays.copyOf(claveEncriptacion, 16);
+
+        SecretKeySpec secretKey = new SecretKeySpec(claveEncriptacion, "AES");
+
+        Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5PADDING");
+        cipher.init(Cipher.DECRYPT_MODE, secretKey);
+
+        byte[] bytesEncriptados = Base64.getDecoder().decode(datosEncriptados);
+        byte[] datosDesencriptados = cipher.doFinal(bytesEncriptados);
+        String datos = new String(datosDesencriptados);
+
+        return datos;
+    }
+
 }
